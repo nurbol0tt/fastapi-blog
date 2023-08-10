@@ -59,3 +59,10 @@ class UserRepository:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail=error
             )
+
+    @classmethod
+    async def get_me(cls, authorize, session: AsyncSession):
+        await authorize.jwt_required()
+        username = await authorize.get_jwt_subject()
+        user = await session.scalar(select(User).where(User.username == username))
+        return user

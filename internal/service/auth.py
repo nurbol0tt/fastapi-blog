@@ -1,6 +1,7 @@
 from async_fastapi_jwt_auth import AuthJWT
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import async_sessionmaker
+from starlette.responses import Response
 
 from internal.config.database import get_session
 from internal.dto.user import UserRequest, UserResponse, LoginSchema, LoginResponse, AccessTokenResponse
@@ -38,3 +39,9 @@ class UserService:
         async with self.async_session.begin() as session:
             refresh_token = await self.repository.refresh_token(self.authorize, session)
             return AccessTokenResponse.from_orm(refresh_token)
+
+    async def get_me(self) -> UserResponse:
+        async with self.async_session.begin() as session:
+            user = await self.repository.get_me(self.authorize, session)
+            return UserResponse.from_orm(user)
+

@@ -33,3 +33,9 @@ async def http_exception_handler(
         response.init_headers(exc.headers)
 
     return response
+
+
+# @app.exception_handler(AuthJWTException)
+# def authjwt_exception_handler(request: Request, exc: AuthJWTException):
+#     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
+

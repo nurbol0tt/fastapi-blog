@@ -1,7 +1,10 @@
+from async_fastapi_jwt_auth import AuthJWT
+from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from asyncpg import UniqueViolationError
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
 from starlette import status
+from starlette.responses import Response
 
 from internal.config.logger import logger
 from internal.service.auth import UserService
@@ -56,18 +59,30 @@ async def login(
     response_model=UserResponse
 )
 async def get_me(
-
-):
-    ...
+        user_service: UserService = Depends(),
+        status_code=status.HTTP_200_OK
+) -> UserResponse:
+    try:
+        return await user_service.get_me()
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @router.post(
-    path='logout'
+    path='/logout',
+    status_code=status.HTTP_200_OK
 )
 async def logout(
-
+        authorize: AuthJWT = Depends(),
 ):
     ...
+    # try:
+    #     await authorize.jwt_required()  # Ensure the user is authenticated
+    #     await authorize.expire_jwt_token()  # Clear JWT cookies to log the user out
+    #     return {"message": "Logged out successfully"}
+    # except AuthJWTException as e:
+    #     raise HTTPException(status_code=e.status_code, detail=str(e))
 
 
 @router.post(
