@@ -3,8 +3,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from internal.config.database import get_session
-from internal.dto.user import UserRequest, UserResponse, LoginSchema, LoginResponse, AccessTokenSchema, \
-    AccessTokenResponse
+from internal.dto.user import UserRequest, UserResponse, LoginSchema, LoginResponse, AccessTokenResponse
 from internal.repository.user import UserRepository
 from internal.usecase.hashing import Hasher
 
@@ -35,7 +34,7 @@ class UserService:
             token = await self.repository.login(self.authorize, session, **dto.dict())
             return LoginResponse.from_orm(token)
 
-    async def refresh_token(self, dto: AccessTokenSchema) -> AccessTokenResponse:
+    async def refresh_token(self) -> AccessTokenResponse:
         async with self.async_session.begin() as session:
-            refresh_token = await self.repository.refresh_token(self.authorize, session, **dto.dict())
+            refresh_token = await self.repository.refresh_token(self.authorize, session)
             return AccessTokenResponse.from_orm(refresh_token)

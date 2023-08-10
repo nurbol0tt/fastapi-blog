@@ -11,7 +11,6 @@ from internal.dto.user import (
     LoginSchema,
     LoginResponse,
     AccessTokenResponse,
-    AccessTokenSchema
 )
 
 router = APIRouter(
@@ -52,14 +51,14 @@ async def login(
         raise HTTPException(400, detail=str(error))
 
 
-# @router.get(
-#     path='/me',
-#     response_model=UserResponse
-# )
-# async def get_me(
-#     user: User = Depends(require_user),
-# ):
-#     return user
+@router.get(
+    path='/me',
+    response_model=UserResponse
+)
+async def get_me(
+
+):
+    ...
 
 
 @router.post(
@@ -76,11 +75,10 @@ async def logout(
     response_model=AccessTokenResponse
 )
 async def refresh_token(
-    dto: AccessTokenSchema,
     user_service: UserService = Depends()
 ) -> AccessTokenResponse:
     try:
-        return await user_service.refresh_token(dto)
+        return await user_service.refresh_token()
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=500, detail="Internal Server Error")

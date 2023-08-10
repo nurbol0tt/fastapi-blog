@@ -37,10 +37,6 @@ class LoginResponse(BaseModel):
         from_attributes = True
 
 
-class AccessTokenSchema(BaseModel):
-    refresh_token: str
-
-
 class AccessTokenResponse(BaseModel):
     access_token: str
 

@@ -34,19 +34,19 @@ class UserRepository:
                 detail="Incorrect Email or Password",
             )
         user.access_token = await authorize.create_access_token(
-            subject=str(user.id), expires_time=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
+            subject=str(user.username), expires_time=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRES_IN)
         )
         user.refresh_token = await authorize.create_refresh_token(
-            subject=str(user.id), expires_time=timedelta(days=settings.REFRESH_TOKEN_EXPIRES_IN)
+            subject=str(user.username), expires_time=timedelta(days=settings.REFRESH_TOKEN_EXPIRES_IN)
         )
         return user
 
     @classmethod
-    async def refresh_token(cls, authorize, session: AsyncSession, **kwargs):
+    async def refresh_token(cls, authorize, session: AsyncSession):
         try:
-            authorize.jwt_refresh_token_required()
-            user_id = await authorize.get_jwt_subject()
-            user = await session.scalar(select(User).where(User.id == str(user_id)))
+            await authorize.jwt_refresh_token_required()
+            username = await authorize.get_jwt_subject()
+            user = await session.scalar(select(User).where(User.username == username))
             user.access_token = await authorize.create_access_token(subject=str(user.id))
             return user
         except Exception as e:
