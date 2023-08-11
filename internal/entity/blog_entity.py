@@ -23,7 +23,7 @@ class Category(TimestampMixin, Base):
     blogs = relationship(
         'Blog',
         secondary=blogs_category_association,
-        back_populates='categories'
+        back_populates='categories',
     )
 
 
@@ -42,7 +42,7 @@ class Blog(TimestampMixin, Base):
     fio = sa.Column(sa.String(255), index=True, nullable=False)
     category_id = sa.Column(
         sa.UUID,
-        sa.ForeignKey('categories.id', ondelete="NO ACTION")
+        sa.ForeignKey('categories.id', ondelete='SET NULL')
     )
 
     categories = relationship(

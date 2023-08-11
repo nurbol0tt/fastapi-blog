@@ -16,27 +16,23 @@ class CategoryABC(ABC):
 
 class CategoryRepository:
 
-    @classmethod
-    async def create(cls, session: AsyncSession, **kwargs):
+    async def create(self, session: AsyncSession, **kwargs):
         category = Category(**kwargs)
         session.add(category)
         await session.flush()
         return category
 
-    @classmethod
-    async def list(cls, session: AsyncSession) -> AsyncIterator[Blog]:
+    async def list(self, session: AsyncSession) -> AsyncIterator[Blog]:
         stmt = select(Category)
         stream = await session.stream_scalars(stmt.order_by(Category.id))
         async for row in stream:
             yield row
 
-    @classmethod
-    async def retrieve(cls, session: AsyncSession, category_id: str):
+    async def retrieve(self, session: AsyncSession, category_id: str):
         stmt = select(Category).where(Category.id == category_id)
         return await session.scalar(stmt.order_by(Category.id))
 
-    @classmethod
-    async def patch(cls, session: AsyncSession, category_id: str, **kwargs):
+    async def patch(self, session: AsyncSession, category_id: str, **kwargs):
         query = (
             update(Category)
             .where(Category.id == category_id)
@@ -45,10 +41,9 @@ class CategoryRepository:
         )
         await session.execute(query)
         await session.flush()
-        return await cls.retrieve(session, category_id)
+        return await self.retrieve(session, category_id)
 
-    @classmethod
-    async def delete(cls, session: AsyncSession, category_id: str) -> None:
+    async def delete(self, session: AsyncSession, category_id: str) -> None:
         statement = select(Category).where(Category.id == category_id)
         result = await session.execute(statement)
         application_id = result.scalar_one_or_none()
