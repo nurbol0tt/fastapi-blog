@@ -22,7 +22,7 @@ class UserResponse(UserBase):
 
 
 class LoginSchema(BaseModel):
-    email: str
+    email: EmailStr
     hashed_password: str
 
     class Config:

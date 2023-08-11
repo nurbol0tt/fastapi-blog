@@ -8,6 +8,7 @@ from alembic import context
 from internal.config import settings
 from internal.entity.base import Base
 from internal.entity.blog_entity import Blog, Category
+from internal.entity.user_entity import User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

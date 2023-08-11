@@ -14,15 +14,13 @@ from internal.usecase.hashing import Hasher
 
 class UserRepository:
 
-    @classmethod
-    async def create(cls, session: AsyncSession, **kwargs):
+    async def create(self, session: AsyncSession, **kwargs):
         user = User(**kwargs)
         session.add(user)
         await session.flush()
         return user
 
-    @classmethod
-    async def login(cls, authorize, session: AsyncSession, **kwargs):
+    async def login(self, authorize, session: AsyncSession, **kwargs):
         user = select(User).where(User.email == kwargs['email'])
         user = await session.scalar(user)
 
@@ -39,8 +37,7 @@ class UserRepository:
         )
         return user
 
-    @classmethod
-    async def refresh_token(cls, authorize, session: AsyncSession):
+    async def refresh_token(self, authorize, session: AsyncSession):
         try:
             await authorize.jwt_refresh_token_required()
             username = await authorize.get_jwt_subject()
@@ -58,8 +55,7 @@ class UserRepository:
                 status_code=status.HTTP_400_BAD_REQUEST, detail=error
             )
 
-    @classmethod
-    async def get_me(cls, authorize, session: AsyncSession):
+    async def get_me(self, authorize, session: AsyncSession):
         await authorize.jwt_required()
         username = await authorize.get_jwt_subject()
         return await session.scalar(select(User).where(User.username == username))
