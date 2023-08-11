@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import Query
 from pydantic import BaseModel, EmailStr
@@ -26,25 +26,26 @@ class BlogBase(BaseModel):
     fio: str
 
 
-class ApplicationRequest(BlogBase):
+class BlogRequest(BlogBase):
     category_id: uuid.UUID
 
 
-class ApplicationResponse(BlogBase):
+class BlogResponse(BlogBase):
     id: Optional[uuid.UUID]
 
     class Config:
         from_attributes = True
 
 
-class ApplicationDetailRead(ApplicationResponse):
+class BlogDetailRead(BlogResponse):
+    categories: List[CategoryResponse] = []
 
     class Config:
         from_attributes = True
 
 
-class ApplicationReadAllResponse(BaseModel):
-    applications: list[ApplicationResponse]
+class BlogReadAllResponse(BaseModel):
+    applications: list[BlogResponse]
 
 
 class CategoryAllResponse(BaseModel):

@@ -43,4 +43,3 @@ class UserService:
         async with self.async_session.begin() as session:
             user = await self.repository.get_me(self.authorize, session)
             return UserResponse.from_orm(user)
-

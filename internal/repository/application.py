@@ -62,36 +62,31 @@ class ApplicationABC(ABC):
 #         await self.session.flush()
 
 
-class ApplicationRepository:
+class BlogRepository:
 
-    @classmethod
-    async def create(cls, session: AsyncSession,  **kwargs):
+    async def create(self, session: AsyncSession,  **kwargs):
         application = Blog(**kwargs)
         session.add(application)
         await session.flush()
         return application
 
-    @classmethod
-    async def list(cls, session: AsyncSession) -> AsyncIterator[Blog]:
+    async def list(self, session: AsyncSession) -> AsyncIterator[Blog]:
         stmt = select(Blog)
         stream = await session.stream_scalars(stmt.order_by(Blog.id))
         async for row in stream:
             yield row
 
-    @classmethod
-    async def retrieve(cls, session: AsyncSession, application_id: str):
+    async def retrieve(self, session: AsyncSession, application_id: str):
         stmt = select(Blog).where(Blog.id == application_id)
         return await session.scalar(stmt)
 
-    @classmethod
-    async def put(cls, session: AsyncSession, application_id: str, **kwargs) -> Blog:
+    async def put(self, session: AsyncSession, application_id: str, **kwargs) -> Blog:
         stmt = update(Blog).where(Blog.id == application_id).values(**kwargs)
         await session.execute(stmt)
         await session.flush()
-        return await cls.retrieve(session, application_id)
+        return await self.retrieve(session, application_id)
 
-    @classmethod
-    async def delete(cls, session: AsyncSession, application_id: str) -> None:
+    async def delete(self, session: AsyncSession, application_id: str) -> None:
         statement = select(Blog).where(Blog.id == application_id)
         result = await session.execute(statement)
         application_id = result.scalar_one_or_none()
