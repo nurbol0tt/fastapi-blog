@@ -4,8 +4,7 @@ from typing import AsyncIterator
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from internal.entity.blog import Blog
-# from internal.entity.blog import Application
+from internal.entity.blog_entity import Blog
 from internal.usecase.hashing import Hasher
 
 

@@ -4,8 +4,7 @@ from typing import AsyncIterator
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from internal.entity.blog import Blog, Category
-from internal.config.database import get_session
+from internal.entity.blog_entity import Blog, Category
 
 
 class CategoryABC(ABC):

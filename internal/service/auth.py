@@ -1,7 +1,6 @@
 from async_fastapi_jwt_auth import AuthJWT
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import async_sessionmaker
-from starlette.responses import Response
 
 from internal.config.database import get_session
 from internal.dto.user import UserRequest, UserResponse, LoginSchema, LoginResponse, AccessTokenResponse

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-from internal.dto.blog import CategoryRead, CategoryInput, CategoryDetailRead, CategoryReadAll
+from internal.dto.blog import CategoryResponse, CategoryRequest, CategoryDetailResponse, CategoryAllResponse
 from internal.service.category import CategoryService
 from internal.usecase.utils.exception import NoContentError
 from internal.config.logger import logger
@@ -14,13 +14,13 @@ router = APIRouter(
 
 @router.post(
     path='',
-    response_model=CategoryRead,
+    response_model=CategoryResponse,
     status_code=status.HTTP_201_CREATED
 )
 async def category_create(
-        dto: CategoryInput,
+        dto: CategoryRequest,
         category_service: CategoryService = Depends()
-) -> CategoryRead:
+) -> CategoryResponse:
     try:
         return await category_service.create(dto)
     except Exception as error:
@@ -29,24 +29,26 @@ async def category_create(
 
 @router.get(
     path='',
-    response_model=CategoryReadAll,
+    response_model=CategoryAllResponse,
     status_code=status.HTTP_200_OK
 )
 async def category_list(
         application_service: CategoryService = Depends()
-) -> CategoryReadAll:
-    return CategoryReadAll(categories=[cs async for cs in application_service.list()])
+) -> CategoryAllResponse:
+    return CategoryAllResponse(
+        categories=[cs async for cs in application_service.list()]
+    )
 
 
 @router.get(
     path='/{category_id}',
-    response_model=CategoryDetailRead,
+    response_model=CategoryDetailResponse,
     status_code=status.HTTP_200_OK
 )
 async def category_detail(
         category_id: str,
         category_service: CategoryService = Depends()
-) -> CategoryDetailRead:
+) -> CategoryDetailResponse:
 
     try:
         category = await category_service.retrieve(category_id)
@@ -62,14 +64,14 @@ async def category_detail(
 
 @router.patch(
     path='/{category_id}',
-    response_model=CategoryRead,
+    response_model=CategoryResponse,
     status_code=status.HTTP_202_ACCEPTED
 )
 async def category_patch(
-        dto: CategoryInput,
+        dto: CategoryRequest,
         category_id: str,
         category_service: CategoryService = Depends()
-) -> CategoryRead:
+) -> CategoryResponse:
     return await category_service.patch(category_id, dto)
 
 
@@ -81,5 +83,14 @@ async def category_delete(
         category_id: str,
         category_service: CategoryService = Depends()
 ) -> None:
-    return await category_service.delete(category_id)
 
+    try:
+        content = await category_service.delete(category_id)
+    except NoContentError:
+        logger.info(f"NoContentError: Category not found: id={id}")
+        raise HTTPException(status_code=404, detail=f"User not found: id={id}")
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+    return content

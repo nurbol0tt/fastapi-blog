@@ -4,55 +4,54 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import Query
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
-class CategoryInput(BaseModel):
+class CategoryRequest(BaseModel):
     title: str
 
 
-class CategoryRead(CategoryInput):
+class CategoryResponse(CategoryRequest):
     id: Optional[uuid.UUID]
 
     class Config:
         from_attributes = True
 
 
-class BaseApplication(BaseModel):
+class BlogBase(BaseModel):
     phone: str
-    email: str
+    email: EmailStr
     text: str
     user: str
     fio: str
 
 
-class ApplicationInput(BaseApplication):
+class ApplicationRequest(BlogBase):
     category_id: uuid.UUID
 
 
-class ApplicationRead(BaseApplication):
+class ApplicationResponse(BlogBase):
     id: Optional[uuid.UUID]
 
     class Config:
         from_attributes = True
 
 
-class ApplicationDetailRead(ApplicationRead):
-    # categories: List[CategoryRead]
+class ApplicationDetailRead(ApplicationResponse):
 
     class Config:
         from_attributes = True
 
 
-class ApplicationReadAll(BaseModel):
-    applications: list[ApplicationRead]
+class ApplicationReadAllResponse(BaseModel):
+    applications: list[ApplicationResponse]
 
 
-class CategoryReadAll(BaseModel):
-    categories: list[CategoryRead]
+class CategoryAllResponse(BaseModel):
+    categories: list[CategoryResponse]
 
 
-class CategoryDetailRead(CategoryRead):
+class CategoryDetailResponse(CategoryResponse):
     id: Optional[uuid.UUID]
     created_at: datetime | None
     updated_at: datetime | None

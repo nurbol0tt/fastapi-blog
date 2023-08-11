@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from . import health
-from . import application
+from . import blog
 from . import category
 from . import auth
 
@@ -10,7 +10,7 @@ router.include_router(
     health.router,
 )
 router.include_router(
-    application.router
+    blog.router
 )
 router.include_router(
     category.router,

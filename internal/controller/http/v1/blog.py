@@ -4,26 +4,30 @@ from sqlalchemy.exc import IntegrityError
 from starlette import status
 
 from internal.config.logger import logger
-from internal.dto.blog import ApplicationRead, BaseApplication, ApplicationReadAll, ApplicationInput, \
-    ApplicationDetailRead
-from internal.service.blog import ApplicationService
+from internal.service.blog_service import ApplicationService
 from internal.usecase.utils.exception import NoContentError, DuplicateError
+from internal.dto.blog import (
+    ApplicationDetailRead,
+    ApplicationResponse,
+    ApplicationReadAllResponse,
+    ApplicationRequest,
+)
 
 router = APIRouter(
-    prefix='/applications',
+    prefix='/blogs',
     tags=['Application'],
 )
 
 
 @router.post(
     path='',
-    response_model=ApplicationRead,
+    response_model=ApplicationResponse,
     status_code=status.HTTP_201_CREATED
 )
 async def application_create(
-        dto: ApplicationInput,
+        dto: ApplicationRequest,
         application_service: ApplicationService = Depends()
-) -> ApplicationRead:
+) -> ApplicationResponse:
     try:
         return await application_service.create(dto)
     except (UniqueViolationError, IntegrityError) as error:
@@ -35,15 +39,17 @@ async def application_create(
 
 @router.get(
     path='',
-    response_model=ApplicationReadAll,
+    response_model=ApplicationReadAllResponse,
     status_code=status.HTTP_200_OK,
 )
 async def application_list(
         application_service: ApplicationService = Depends()
-) -> ApplicationReadAll:
+) -> ApplicationReadAllResponse:
 
     try:
-        application = ApplicationReadAll(applications=[ap async for ap in application_service.list()])
+        application = ApplicationReadAllResponse(
+            applications=[ap async for ap in application_service.list()]
+        )
     except NoContentError as e:
         logger.info(f"NoContentError: {e}")
         raise HTTPException(status_code=404, detail=str(e))
@@ -77,7 +83,7 @@ async def application_retrieve(
 
 @router.put(
     path='/{application_id}',
-    response_model=ApplicationRead,
+    response_model=ApplicationResponse,
     status_code=status.HTTP_202_ACCEPTED,
     responses={
         204: {
@@ -86,10 +92,10 @@ async def application_retrieve(
     }
 )
 async def application_put(
-        dto: ApplicationInput,
+        dto: ApplicationRequest,
         application_id: str = Path(title="The ID of the application"),
         application_service: ApplicationService = Depends()
-) -> ApplicationRead:
+) -> ApplicationResponse:
 
     try:
         content = await application_service.put(application_id, dto)

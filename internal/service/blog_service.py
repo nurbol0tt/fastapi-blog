@@ -4,7 +4,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from internal.config.database import get_session
-from internal.dto.blog import BaseApplication, ApplicationRead, ApplicationInput, CategoryRead, ApplicationDetailRead
+from internal.dto.blog import ApplicationResponse, ApplicationRequest, ApplicationDetailRead
 from internal.repository.application import ApplicationRepository
 
 
@@ -43,26 +43,26 @@ class ApplicationService:
         self.async_session = session
         self.repository = repository
 
-    async def create(self, dto: ApplicationInput) -> ApplicationRead:
+    async def create(self, dto: ApplicationRequest) -> ApplicationResponse:
         async with self.async_session.begin() as session:
             application = await self.repository.create(session, **dto.dict())
-            return ApplicationRead.from_orm(application)
+            return ApplicationResponse.from_orm(application)
 
-    async def list(self) -> AsyncIterator[ApplicationRead]:
+    async def list(self) -> AsyncIterator[ApplicationResponse]:
         async with self.async_session.begin() as session:
             async for application in self.repository.list(session):
 
-                yield ApplicationRead.from_orm(application)
+                yield ApplicationResponse.from_orm(application)
 
     async def retrieve(self, application_id: str) -> ApplicationDetailRead:
         async with self.async_session.begin() as session:
             application = await self.repository.retrieve(session, application_id)
             return ApplicationDetailRead.from_orm(application)
 
-    async def put(self, application_id: str, dto: ApplicationInput) -> ApplicationRead:
+    async def put(self, application_id: str, dto: ApplicationRequest) -> ApplicationResponse:
         async with self.async_session.begin() as session:
             application = await self.repository.put(session, application_id, **dto.dict())
-            return ApplicationRead.from_orm(application)
+            return ApplicationResponse.from_orm(application)
 
     async def delete(self, application_id: str) -> None:
         async with self.async_session.begin() as session:

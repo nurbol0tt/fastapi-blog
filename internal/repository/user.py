@@ -1,4 +1,3 @@
-import logging
 from datetime import timedelta
 
 from starlette import status
@@ -8,9 +7,8 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from internal.config.logger import logger
 from internal.config import settings
-from internal.entity.user import User
+from internal.entity.user_entity import User
 from internal.usecase.hashing import Hasher
 
 
@@ -64,5 +62,4 @@ class UserRepository:
     async def get_me(cls, authorize, session: AsyncSession):
         await authorize.jwt_required()
         username = await authorize.get_jwt_subject()
-        user = await session.scalar(select(User).where(User.username == username))
-        return user
+        return await session.scalar(select(User).where(User.username == username))

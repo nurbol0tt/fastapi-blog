@@ -1,10 +1,8 @@
 from async_fastapi_jwt_auth import AuthJWT
-from async_fastapi_jwt_auth.exceptions import AuthJWTException
 from asyncpg import UniqueViolationError
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import IntegrityError
 from starlette import status
-from starlette.responses import Response
 
 from internal.config.logger import logger
 from internal.service.auth import UserService
@@ -56,11 +54,11 @@ async def login(
 
 @router.get(
     path='/me',
-    response_model=UserResponse
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK
 )
 async def get_me(
         user_service: UserService = Depends(),
-        status_code=status.HTTP_200_OK
 ) -> UserResponse:
     try:
         return await user_service.get_me()
@@ -97,4 +95,3 @@ async def refresh_token(
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=500, detail="Internal Server Error")
-
